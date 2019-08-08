@@ -55,15 +55,15 @@ def my_predict():
             max_index = np.argmax(prediction)     
 
             if max_index == 0:
-                label = '%.2f%% is a' + str(my_labels[0]) + '.' % (prediction[0][0] * 100)
+                label = '%.2f%% ' % (prediction[0][0] * 100) + 'is a ' + str(my_labels[0]) + '.'
             elif max_index == 1:
-                label = '%.2f%% is a' + str(my_labels[1]) + '.' % (prediction[0][1] * 100)
+                label = '%.2f%% ' % (prediction[0][1] * 100) + 'is a ' + str(my_labels[1]) + '.'
             elif max_index == 2:
-                label = '%.2f%% is a' + str(my_labels[2]) + '.' % (prediction[0][2] * 100)
+                label = '%.2f%% ' % (prediction[0][2] * 100) + 'is a ' + str(my_labels[2]) + '.'
             elif max_index == 3:
-                label = '%.2f%% is a' + str(my_labels[3]) + '.' % (prediction[0][3] * 100)
+                label = '%.2f%% ' % (prediction[0][3] * 100) + 'is a ' + str(my_labels[3]) + '.'
             elif max_index == 4:
-                label = '%.2f%% is a' + str(my_labels[4]) + '.' % (prediction[0][4] * 100)
+                label = '%.2f%% ' % (prediction[0][4] * 100) + 'is a ' + str(my_labels[4]) + '.'
 
             plt.imshow(image[0])
             plt.title(label)
