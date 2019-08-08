@@ -1,0 +1,16 @@
+n_classes: 5
+my_labels: ['flower', 'guitar', 'animal', 'houses', 'plane']
+batch_size: 8
+max_step: 1000
+
+train_dir: 'dataSet/train'
+train_txt: 'dataSet/train.txt'
+val_dir: 'dataSet/val'
+val_txt: 'dataSet/val.txt'
+logs_dir: 'logs_2'
+
+resize_height: 299 
+resize_width: 299
+shuffle: True
+log: 100
+    
