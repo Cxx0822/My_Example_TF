@@ -61,6 +61,7 @@ def create_model_single_layer(input_features, input_dim, label_dim):
     weight = tf.Variable(tf.random_normal([input_dim, label_dim]), name="weight")
     bias = tf.Variable(tf.zeros([label_dim]), name="bias")
     output = tf.add(tf.matmul(input_features, weight), bias)
+    tf.add_to_collection("output", output)
 
     return output
 
@@ -87,6 +88,7 @@ def create_model_multiple_layer(input_features, input_dim, label_dim):
     layer_2 = tf.nn.relu(layer_2)
 
     out_layer = tf.add(tf.matmul(layer_2, weights["out"]), biases["out"])  
+    tf.add_to_collection("output", out_layer)
 
     return out_layer
 
@@ -112,12 +114,12 @@ def train():
                 fr.write(str(Y_test[i][j]) + '\t')    
             fr.write('\n')
 
-    input_features = tf.placeholder(tf.float32, [None, input_dim])
-    input_labels = tf.placeholder(tf.float32, [None, label_dim]) 
+    input_features = tf.placeholder(tf.float32, [None, input_dim], name="input_features")
+    input_labels = tf.placeholder(tf.float32, [None, label_dim], name="input_labels") 
 
     # 模型输出
-    # output = create_model_single_layer(input_features, input_dim, label_dim)   # 单层神经网络
-    output = create_model_multiple_layer(input_features, input_dim, label_dim)   # 多层神经网络
+    output = create_model_single_layer(input_features, input_dim, label_dim)   # 单层神经网络
+    # output = create_model_multiple_layer(input_features, input_dim, label_dim)   # 多层神经网络
 
     # 计算错误率
     predict_value = tf.argmax(tf.nn.softmax(output), axis=1)
@@ -158,24 +160,17 @@ def train():
 def predict(X_test): 
     # 预测模型  
     with tf.Session() as sess:
-        # 模型输出
-        # train_logits = create_model_single_layer(X_test, input_dim, label_dim)
-        train_logits = create_model_multiple_layer(X_test, input_dim, label_dim)
-        train_logits = tf.nn.softmax(train_logits)  
-
         # 加载模型
-        saver = tf.train.Saver()
-        print('\nLoading checkpoints...')
         ckpt = tf.train.get_checkpoint_state(logs_dir)
-        if ckpt and ckpt.model_checkpoint_path:
-            global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-            saver.restore(sess, ckpt.model_checkpoint_path)
-            print('Successful loading')
-        else:
-            print('No checkpoints')
+        saver = tf.train.import_meta_graph(ckpt.model_checkpoint_path + '.meta')
+        saver.restore(sess, ckpt.model_checkpoint_path)
+        graph = tf.get_default_graph()
 
-        prediction = sess.run(train_logits)  
+        # 导出训练时保存的名字
+        input_features = graph.get_operation_by_name('input_features').outputs[0]
+        output = tf.get_collection("output")[0]
 
+        prediction = sess.run(output, feed_dict={input_features: X_test})
         # 选取最大值为预测结果
         result = np.argmax(prediction)   
         print('result: ', result)  
@@ -193,5 +188,5 @@ if __name__ == "__main__":
             floatLine = np.matrix(list(map(float, curLine)), dtype="float32")  
             X_tests.append(floatLine) 
 
-    predict(X_tests[2])      # 选择测试哪个，并和Y_test.txt对照
+    predict(X_tests[0])      # 选择测试哪个，并和Y_test.txt对照
     '''
