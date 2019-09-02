@@ -195,7 +195,26 @@ def disp_records(record_file, resize_height, resize_width, show_nums=4):
         coord.join(threads)
 
 
+def parse_records(serialized_example):
+    features = tf.io.parse_single_example(
+        serialized_example,
+        features={
+            'image_raw': tf.io.FixedLenFeature([], tf.string),
+            'height': tf.io.FixedLenFeature([], tf.int64),
+            'width': tf.io.FixedLenFeature([], tf.int64),
+            'depth': tf.io.FixedLenFeature([], tf.int64),
+            'label': tf.io.FixedLenFeature([], tf.int64)
+        }
+    )
+    tf_image = tf.decode_raw(features['image_raw'], tf.uint8)
+    tf_image = tf.reshape(tf_image, [resize_height, resize_width, 3]) 
+    tf_image = tf.cast(tf_image, tf.float32) * (1. / 255.0)  
+
+    tf_label = tf.cast(features['label'], tf.int32)
+
+    return tf_image, tf_label
+
+
 if __name__ == '__main__':
     create_records_train()
     create_records_val()
-    # disp_records(train_record_output, resize_height, resize_width)
