@@ -1,7 +1,7 @@
-n_classes: 2
-my_labels: ['flower', 'animal']
-batch_size: 4
-max_step: 10
+n_classes: 5
+my_labels: ['animal', 'flower', 'guitar', 'houses', 'plane']
+batch_size: 8
+max_step: 1000
 LEARNING_RATE: 0.0001
 
 train_dir: 'dataSet/train'
