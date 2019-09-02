@@ -1,12 +1,17 @@
-n_classes: 5
-my_labels: ['flower', 'guitar', 'animal', 'houses', 'plane']
-batch_size: 8
-max_step: 1000
+n_classes: 2
+my_labels: ['flower', 'animal']
+batch_size: 4
+max_step: 10
+LEARNING_RATE: 0.0001
 
 train_dir: 'dataSet/train'
 train_txt: 'dataSet/train.txt'
+train_tfrecord: 'dataSet/record/train299.tfrecords'
+
 val_dir: 'dataSet/val'
 val_txt: 'dataSet/val.txt'
+val_tfrecord: 'dataSet/record/val299.tfrecords'
+
 logs_dir: 'logs_2'
 
 resize_height: 299 
