@@ -6,7 +6,7 @@ def conv_op(input_op, name, kh, kw, n_out, dh, dw):
     n_in = input_op.get_shape()[-1].value
 
     with tf.name_scope(name) as scope:
-        kernel = tf.get_variable(scope + "w",
+        kernel = tf.compat.v1.get_variable(scope + "w",
                                  shape=[kh, kw, n_in, n_out], dtype=tf.float32, 
                                  initializer=tf.contrib.layers.xavier_initializer_conv2d())
 
@@ -20,24 +20,24 @@ def conv_op(input_op, name, kh, kw, n_out, dh, dw):
 
 
 def mpool_op(input_op, name, kh, kw, dh, dw):
-    return tf.nn.max_pool(input_op, ksize=[1, kh, kw, 1], strides=[1, dh, dw, 1], padding="SAME", name=name)
+    return tf.nn.max_pool2d(input_op, ksize=[1, kh, kw, 1], strides=[1, dh, dw, 1], padding="SAME", name=name)
 
 
 def fc_op(input_op, name, n_out):
     n_in = input_op.get_shape()[-1].value
 
     with tf.name_scope(name) as scope:
-        kernel = tf.get_variable(scope + "w",
+        kernel = tf.compat.v1.get_variable(scope + "w",
                                  shape=[n_in, n_out], dtype=tf.float32, 
                                  initializer=tf.contrib.layers.xavier_initializer_conv2d())
 
         biases = tf.Variable(tf.constant(0.1, shape=[n_out], dtype=tf.float32), name='b')
-        activation = tf.nn.relu_layer(input_op, kernel, biases, name=scope)
+        activation = tf.compat.v1.nn.relu_layer(input_op, kernel, biases, name=scope)
 
         return activation
 
 
-def inference_op(images, keep_prob, n_classes):
+def inference_op(images, n_classes):
     conv1_1 = conv_op(images, name="conv1_1", kh=3, kw=3, n_out=64, dh=1, dw=1)
     conv1_2 = conv_op(conv1_1, name="conv1_2", kh=3, kw=3, n_out=64, dh=1, dw=1)
     pool1 = mpool_op(conv1_2, name="pool1", kh=2, kw=2, dh=2, dw=2)
@@ -66,31 +66,31 @@ def inference_op(images, keep_prob, n_classes):
     resh1 = tf.reshape(pool5, [-1, flattened_shape], name="resh1")
 
     fc6 = fc_op(resh1, name="fc6", n_out=1024)
-    fc6_drop = tf.nn.dropout(fc6, keep_prob, name="fc6_drop")
 
-    with tf.variable_scope("softmax_linear") as scope:
-        weights = tf.get_variable("weights",
+    with tf.compat.v1.variable_scope("softmax_linear") as scope:
+        weights = tf.compat.v1.get_variable("weights",
                                   shape=[1024, n_classes],
                                   dtype=tf.float32,
                                   initializer=tf.truncated_normal_initializer(stddev=0.005, dtype=tf.float32))
-        biases = tf.get_variable("biases",
+        biases = tf.compat.v1.get_variable("biases",
                                  shape=[n_classes],
                                  dtype=tf.float32,
                                  initializer=tf.constant_initializer(0.1))
-        softmax_linear = tf.add(tf.matmul(fc6_drop, weights), biases, name="softmax_linear")
+        softmax_linear = tf.add(tf.matmul(fc6, weights), biases, name="softmax_linear")
+    tf.compat.v1.add_to_collection("output", softmax_linear)
 
     return softmax_linear
 
 
 def losses(logits, labels):
-    with tf.variable_scope('loss'):
+    with tf.compat.v1.variable_scope('loss'):
         cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels)
         loss = tf.reduce_mean(cross_entropy)
     return loss
 
 
 def evaluation(logits, labels):
-    with tf.variable_scope("accuracy"):
+    with tf.compat.v1.variable_scope("accuracy"):
         correct = tf.nn.in_top_k(logits, labels, 1)
         correct = tf.cast(correct, tf.float16)
         accuracy = tf.reduce_mean(correct)
