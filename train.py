@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import yaml
 
 with open("info.yml") as stream:
-    my_data = yaml.load(stream, Loader=yaml.FullLoader)
+    my_data = yaml.load(stream)
 
 N_CLASSES = my_data['n_classes']
 BATCH_SIZE = my_data['batch_size']
@@ -49,20 +49,23 @@ def my_train_queue():
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-    # 计时
-    start_time = time.time()
-    now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     try:
         for step in range(MAX_STEP):
             if coord.should_stop():
                 break
+
+            # 计时
+            start_time = time.time()
+  
             # 启动模型、损失、正确率
             _, loss, acc = sess.run([train_op, train_loss, train_acc])
+
+            now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
 
             # 每10步显示，可以自己更改
             if step % 10 == 0:  
                 runtime = time.time() - start_time
-                print('Step: %6d, now_time: %s, loss: %.8f, accuracy: %.2f%%, time:%.2fs, time left: %.2fhours'
+                print('Step: %6d, now_time: %s, loss: %.8f, accuracy: %.2f%%, time/step:%.2fs, time left: %.2fhours'
                       % (step, str(now_time), loss, acc * 100, runtime, (MAX_STEP - step) * runtime / 3600))
                 start_time = time.time()
 
@@ -107,20 +110,21 @@ def my_train_tfData():
         # 启动初始化和迭代器
         sess.run(tf.compat.v1.global_variables_initializer())
         sess.run(iterator.initializer, feed_dict={filename: train_filename})
-
-        # 计时
-        start_time = time.time()
-        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')   
-
+    
         # 迭代学习
-        for step in range(MAX_STEP):   
+        for step in range(MAX_STEP):  
+            # 计时
+            start_time = time.time()
+  
             # 启动模型、损失、正确率
             _, loss, acc = sess.run([train_op, train_loss, train_acc])
+
+            now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
 
             # 每10步显示，可以自己更改
             if step % 10 == 0:  
                 runtime = time.time() - start_time
-                print('Step: %6d, now_time: %s, loss: %.8f, accuracy: %.2f%%, time:%.2fs, time left: %.2fhours'
+                print('Step: %6d, now_time: %s, loss: %.8f, accuracy: %.2f%%, time/step:%.2fs, time left: %.2fhours'
                       % (step, str(now_time), loss, acc * 100, runtime, (MAX_STEP - step) * runtime / 3600))
                 start_time = time.time()
 
