@@ -6,12 +6,11 @@
 &emsp;&emsp;python 3.5.4   
 
 # Simple Network
+&emsp;&emsp;主要利用单层和多层`BP`神经网络对文本数据集分类。
+
 ## 文件
 &emsp;&emsp;data.txt      
-&emsp;&emsp;simple_network.py
-
-# 用途
-&emsp;&emsp;主要利用单层和多层`BP`神经网络对文本数据集分类。   
+&emsp;&emsp;simple_network.py 
 
 ## 数据集
 &emsp;&emsp;首先确保数据集的格式和`data.txt`中的格式一致，即特征+标签。如果不一致，需要更改`simple_network.py`中的`load_data()`函数。其最终返回值为特征和`one-hot`编码的标签。    
