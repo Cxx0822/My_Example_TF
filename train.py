@@ -34,7 +34,7 @@ def my_train_queue():
     sess = tf.Session()
 
     # 加载模型，并计算损失、正确率等
-    train_logits = inference_op(image_train_batch, 0.5, N_CLASSES)
+    train_logits = inference_op(image_train_batch, N_CLASSES)
     train_loss = losses(train_logits, label_train_batch)
     train_acc = evaluation(train_logits, label_train_batch)
 
